@@ -8,8 +8,9 @@ exports.ensureAuth = (req, res, next)=>{
         if(err)
             return res.status(401).send({message: 'Token incorrecto', error: err, success: false});
         else{
-                next();
-                req.user = decoded.user;
+            req.user = decoded.user;
+            next();
+                
         }
             
     });

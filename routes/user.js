@@ -11,18 +11,28 @@ var md_auth = require('../middlewares/jwt');
 // ========================
 //  Obtener usuarios
 // ========================
-api.get('/',  md_auth.ensureAuth, (req, res)=>{
+api.get('/', (req, res)=>{
+
+    var from = req.query.from || 0;
+    from = Number(from);
+    var resulsPerPage = 5;
     User.find({
 
-    },'name email image role',).exec(
-    (err, users)=>{
+    },'name email image role',)
+    .skip(from)
+    .limit(resulsPerPage)
+    .exec((err, users)=>{
         if(err){
             res.status(500).send({message: 'Error en el servidor', success: false});
             return;
         }
         else{
             if(users)
-                res.status(200).send({users, success: true});
+               {
+                    User.count({}, (err, totalUsers)=>{
+                        res.status(200).send({users, success: true, total: totalUsers});
+                    });                    
+                }
         }
         
     });  
@@ -37,7 +47,7 @@ api.post('/', md_auth.ensureAuth, md_auth.ensureAuth, (req, res)=>{
         name: body.name,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
-        img: body.img,
+        image: body.img || 'null',
         role: body.role
     });
 
