@@ -22,6 +22,9 @@ api.put('/:type/:id', (req, res, next)=>{
     var type = req.params.type;
     var id = req.params.id;
 
+    console.log(type);
+    console.log(id);
+
     var validCollections = [ 'hospitals', 'users','doctors'];
     if(validCollections.indexOf(type) < 0){
         return res.status(400).json({
@@ -38,7 +41,7 @@ api.put('/:type/:id', (req, res, next)=>{
     }
 
     //obtener nombre del archivo
-    var archivo = req.files.img;
+    var archivo = req.files.image;    
     var cutName = archivo.name.split('.');  
     var lastPos = cutName.length -1;  
     var fileExt = cutName[lastPos];    
@@ -76,30 +79,40 @@ function uploadByType(collection, id, newFileName, res){
     if(collection == 'users'){
         User.findById(id, (err, user)=>{
             if(err)
-                res.status(500).json({message:'error al actualizar imagen de usuario'});
+                return res.status(500).json({message:'error al actualizar imagen de usuario'});
 
             var oldPath = './upload/users/' + user.image;
             //si existe una imagen anterior la elimino
-            if(fs.existsSync(oldPath)){
-                fs.unlink(oldPath);
+            if(fs.existsSync(oldPath, err)){
+                if (err){
+                    console.log(err);
+                    return res.status(500).json({message:'error al actualizar imagen de usuario'});
+                }else{
+                    fs.unlink(oldPath, function(err){
+                        if(err)
+                            return res.status(500).json({message:'error al actualizar imagen de usuario'});
+                    });
+                }
+                
             }
 
             user.image = newFileName;
             user.save( (err, updatedUser)=>{
                 if(err)
                     return res.status(500).json({message:'error al actualizar imagen de usuario'});
-                    if(!updatedUser){
-                        return res.status(400).json({
-                            success: false,                
-                            message: 'No se actualizó el usuario',                            
-                        });
-                    }
-                    updatedUser.password = ':)';
-                    return res.status(200).json({
-                        success: true,                
-                        message: 'Imagen de usuario actualizada',
-                        user: updatedUser
+
+                if(!updatedUser){
+                    return res.status(400).json({
+                        success: false,                
+                        message: 'No se actualizó el usuario',                            
                     });
+                }
+                updatedUser.password = ':)';
+                return res.status(200).json({
+                    success: true,                
+                    message: 'Imagen de usuario actualizada',
+                    user: updatedUser
+                });
             });
         });
     }

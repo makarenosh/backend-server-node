@@ -18,14 +18,26 @@ var upload_routes = require('./routes/upload');
 var app = express();
 
 // parse application/x-www-form-urlencoded
-app.use(bodyParser.urlencoded({ extended: false }))
-
+// app.use(bodyParser.urlencoded({ extended: false }))
+// configure the app to use bodyParser()
+app.use(bodyParser.urlencoded({
+    extended: true
+}));
+app.use(bodyParser.json());
 
 //DB conection
 mongoose.connection.openUri('mongodb://localhost:27017/hospitalDB', { useNewUrlParser: true }, (error, res)=>{
     if(error)
         console.log(error);
         console.log('conectado a la DB hospitalDB en mongoDB');
+});
+
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-Control-Allow-Request-Method');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
+    res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
+    next();
 });
 
 //rutas
@@ -36,6 +48,7 @@ app.use('/hospital', hospital_routes);
 app.use('/search', search_routes);
 app.use('/upload',fileUpload(), upload_routes);
 app.use('/', app_routes);
+
 
 
 //escuchar peticiones

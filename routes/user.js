@@ -41,18 +41,18 @@ api.get('/', (req, res)=>{
 // ========================
 //  Añadir usuarios
 // ========================
-api.post('/', md_auth.ensureAuth, md_auth.ensureAuth, (req, res)=>{
-    var body = req.body;
+api.post('/', (req, res)=>{
+    var body = req.body;    
     var user = new User({
         name: body.name,
         email: body.email,
         password: bcrypt.hashSync(body.password, 10),
         image: body.img || 'null',
-        role: body.role
+        role: body.role || 'USER_ROLE'
     });
 
     user.save((err, savedUser)=>{
-        if(err){
+        if(err){            
             res.status(400).send({message: 'Error al crear el nuevo usuario en el servidor', error: err, success: false});
             return;
         }
