@@ -65,7 +65,7 @@ api.put('/:type/:id', (req, res, next)=>{
         if(err){
             return res.status(500).json({
                 success: false,
-                message: 'Error al guardar el archivo en la carpeta' + type + ' del servidor'
+                message: 'Error al guardar el archivo en la carpeta ' + type + ' del servidor'
             });
         }else{            
             uploadByType(type, id, newFileName, res);
@@ -125,7 +125,9 @@ function uploadByType(collection, id, newFileName, res){
             var oldPath = './upload/hospitals/' + hospital.img;
             //si existe una imagen anterior la elimino
             if(fs.existsSync(oldPath)){
-                fs.unlink(oldPath);
+                fs.unlink(oldPath, function(res){
+
+                });
             }
 
             hospital.img = newFileName;
@@ -157,7 +159,8 @@ function uploadByType(collection, id, newFileName, res){
             var oldPath = './upload/doctors/' + doctor.img;
             //si existe una imagen anterior la elimino
             if(fs.existsSync(oldPath)){
-                fs.unlink(oldPath);
+                // fs.unlink(oldPath);
+                fs.unlinkSync(oldPath)
             }
 
             doctor.img = newFileName;
@@ -174,7 +177,7 @@ function uploadByType(collection, id, newFileName, res){
                     return res.status(200).json({
                         success: true,                
                         message: 'Imagen de doctor actualizada',
-                        user: updatedUser
+                        doctor: updatedDoctor
                     });
 
             });

@@ -18,7 +18,7 @@ api.get('/', (req, res)=>{
     var resulsPerPage = 5;
     User.find({
 
-    },'name email image role',)
+    },'name email image role google',)
     .skip(from)
     .limit(resulsPerPage)
     .exec((err, users)=>{

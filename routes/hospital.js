@@ -36,6 +36,18 @@ api.get('/', (req, res)=>{
     });  
 });
 
+api.get('/:id', (req, res)=>{
+    var id = req.params.id;    
+    Hospital.findById(id, (err, hospital)=>{
+        if(err){
+            res.status(500).send({message: 'Error al obtener el hospital en el servidor', error: err, success: false});
+            return;
+        }
+        if(hospital)
+            res.status(200).send({hospital, success: true});
+    } );
+});
+
 // ========================
 //  Añadir hospitals
 // ========================

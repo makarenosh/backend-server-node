@@ -11,16 +11,16 @@ var md_auth = require('../middlewares/jwt');
 //  Obtener doctors
 // ========================
 api.get('/', (req, res)=>{
-    var from = req.query.from || 0;
-    from = Number(from);
-    var resulsPerPage = 5;
+    // var from = req.query.from || 0;
+    // from = Number(from);
+    // var resulsPerPage = 5;
     Doctor.find({
 
     })
     .populate('user', 'name email img')
     .populate('hospital')
-    .skip(from)
-    .limit(resulsPerPage)
+    // .skip(from)
+    // .limit(resulsPerPage)
     .exec(
     (err, doctors)=>{
         if(err){
@@ -40,10 +40,22 @@ api.get('/', (req, res)=>{
     });  
 });
 
+api.get('/:id', (req, res)=>{
+    var id = req.params.id;    
+    Doctor.findById(id, (err, doctor)=>{
+        if(err){
+            res.status(500).send({message: 'Error al obtener el doctor en el servidor', error: err, success: false});
+            return;
+        }
+        if(doctor)
+            res.status(200).send({doctor, success: true});
+    } );
+});
+
 // ========================
 //  Añadir doctors
 // ========================
-api.post('/', md_auth.ensureAuth, md_auth.ensureAuth, (req, res)=>{
+api.post('/', md_auth.ensureAuth, (req, res)=>{
     var body = req.body;
     var doctor = new Doctor({
         name: body.name,
@@ -59,6 +71,8 @@ api.post('/', md_auth.ensureAuth, md_auth.ensureAuth, (req, res)=>{
         else{
             if(savedDoctor)
                 res.status(201).send({savedDoctor, success: true});
+            else
+                console.log('NO SE GUARDO EL SERVLET')
         }
     });
     
